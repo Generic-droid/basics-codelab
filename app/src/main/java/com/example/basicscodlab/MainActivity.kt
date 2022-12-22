@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,18 +29,36 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String) {
+    /**
+     * [remember] is used to guard against recomposition,
+     *  so the state is not reset.
+     */
+
+    val expanded = remember {
+        mutableStateOf(false)
+    }
+
+    /**
+     * Don't need to remember [extraPadding] against recomposition
+     * because it's doing a simple calculation.
+     */
+    val extraPadding = if (expanded.value) 48.dp else 0.dp
+
     Surface(
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
         Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier.weight(1f))
+            Column( modifier = Modifier
+                .weight(1f)
+                .padding(bottom = extraPadding)
+            )
             {
                 Text(text = "Hello, ")
                 Text(text = "$name!")
             }
-            ElevatedButton(onClick = { /*TODO*/ }) {
-                Text(text = "Show more")
+            ElevatedButton(onClick = { expanded.value = !expanded.value }) {
+                Text(text = if (expanded.value) "Show less" else "Show more")
             }
         }
     }
